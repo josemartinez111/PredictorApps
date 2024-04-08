@@ -1,23 +1,17 @@
 // FILE: presentation/gameDataLoader.ts
 // _______________________________________________
 
+import { predictOutcome, predictOverUnder } from "../application/predictions";
 import { GameData, TeamData } from "../domain/dataEntities";
+import { DataInputLogic, GameDataInputType, LoaderLogic } from "../domain/types/typeHelpers";
 import { roundHelper, scoredAndAllowedAdjuster } from "../infrastructure/utils";
-// _______________________________________________
+import { withConsoleColorLogger } from "./custom-loggers/colorLogger";
 
-type GameDataInputType = {
-	sport: string,
-	kFactor?: number, // Optional and provide a default if not supplied
-	overUnderLine: number,
-	spread: number,
-	homeTeam: string,
-	favoredTeam: string,
-}
 // _______________________________________________
 
 export function GameDataLoader() {
 	// Utility method for creating team data
-	const  createTeamData = (
+	const createTeamData = (
 		name: string,
 		scored: number,
 		allowed: number,
@@ -29,6 +23,7 @@ export function GameDataLoader() {
 		awayWins: number,
 		awayLosses: number,
 		totalGamesPlayed: number): TeamData => {
+		
 		return {
 			name,
 			scored: scoredAndAllowedAdjuster(scored),
@@ -42,7 +37,7 @@ export function GameDataLoader() {
 			awayLosses,
 			totalGamesPlayed,
 		};
-	}
+	};
 	
 	/**
 	 *
@@ -70,11 +65,39 @@ export function GameDataLoader() {
 			homeTeam,
 			favoredTeam,
 		};
-	}
+	};
+	
 	
 	return {
 		createTeamData,
 		loadGameData,
-	}
+	};
 }
-// _______________________________________________
+
+// ___________________________________________________________________
+
+export function runApp(
+	loader: LoaderLogic,
+	team1Data: TeamData,
+	team2Data: TeamData,
+	gameDataInput: DataInputLogic) {
+	
+	const gameData = loader.loadGameData(
+		team1Data,
+		team2Data,
+		gameDataInput,
+	);
+	
+	const headerMsg = `=================== [ ${ gameData.sport } ] ====================`;
+	withConsoleColorLogger(headerMsg, "dodgerBlue", true);
+	
+	predictOutcome(gameData);
+	const overUnderPrediction = predictOverUnder(gameData);
+	
+	withConsoleColorLogger(
+		`Over/Under prediction: ${ overUnderPrediction }`,
+		"cyan",
+		true,
+	);
+};
+// ___________________________________________________________________
