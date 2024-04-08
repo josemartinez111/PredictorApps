@@ -49,7 +49,7 @@ export const withColorLogger = (
 // _______________________________________________
 
 // noinspection JSUnusedGlobalSymbols
-export const spacer = (msg: string, spaceCount: number = 0) => {
+export const spacerWithMsg = (msg: string, spaceCount: number = 0) => {
 	const spacer = '-'.repeat(spaceCount);
 	
 	const msgResult = `
@@ -60,4 +60,10 @@ export const spacer = (msg: string, spaceCount: number = 0) => {
 	const item = withColorLogger(msgResult, "dodgerBlue", true);
 	return item;
 };
+
+export const spacerH1 = (character: string = "-", spaceCount: number, color: ColorName) => {
+	const spacer = character.repeat(spaceCount);
+	const item = withColorLogger(spacer, color, true);
+	return item;
+}
 // _______________________________________________
