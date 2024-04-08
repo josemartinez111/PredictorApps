@@ -2,14 +2,12 @@
 // _______________________________________________
 
 import { GameData } from "../domain/dataEntities";
-import { spacerH1, withConsoleColorLogger } from "../infrastructure/colorLogger";
+import { withColorLogger } from "../presentation/custom-loggers/colorLogger";
+import { outcomeLogger } from "../presentation/custom-loggers/outcome-logger";
+import { overUnderLogger } from "../presentation/custom-loggers/over-under-logger";
 import {
-	calcEloRating, calcSpreadFactor,
-	calcWinPctPythagorean, calcRegressionFactor,
+	calcEloRating, calcSpreadFactor, calcWinPctPythagorean, calcRegressionFactor,
 } from "./calculations";
-// _______________________________________________
-
-const spacer = spacerH1("_", 55, "dodgerBlue");
 // _______________________________________________
 
 export const predictOutcome = (data: GameData): string => {
@@ -48,53 +46,22 @@ export const predictOutcome = (data: GameData): string => {
 	
 	// Determine expected winner
 	let outcomeMessage: string;
+	// Calculates the absolute difference between the two probabilities
+	let absoluteDiff = Math.abs(winProbability1 - winProbability2);
+	const eitherWayMsg = "[ THE GAME COULD GO EITHER WAY ]";
 	
-	outcomeMessage = winProbability1 > winProbability2
-		? `Expected winner: ${ data.team1.name }`
-		: winProbability1 < winProbability2
-			? `Expected winner: ${ data.team2.name }`
-			: "The game could go either way.";
-	
-	// Logging structure
-	withConsoleColorLogger(spacer, "dodgerBlue", true);
-	withConsoleColorLogger(
-		`Teams: ${ data.team1.name } vs ${ data.team2.name }`,
-		"netflixRed", true,
-	);
-	
-	if (data.homeTeam === data.team1.name) {
-		withConsoleColorLogger(
-			`Home Team: ${ data.team1.name }`,
-			"netflixRed",
-			true,
-		);
-	} else if (data.homeTeam === data.team2.name) {
-		withConsoleColorLogger(
-			`Home Team: ${ data.team2.name }`,
-			"netflixRed",
-			true,
-		);
-	}
-	withConsoleColorLogger(spacer, "dodgerBlue", true);
-	
-	if (data.spread) {
-		withConsoleColorLogger(`Spread: ${ data.spread }`, "cyan", true);
-	}
-	
-	const msgTeam1 = `Team 1 (${ data.team1.name }) Win Probability: ${ (winProbability1 * 100).toFixed(2) }%`;
-	withConsoleColorLogger(msgTeam1, "cyan", true);
-	
-	const msgTeam2 = `Team 2 (${ data.team2.name }) Win Probability: ${ (winProbability2 * 100).toFixed(2) }%`;
-	withConsoleColorLogger(msgTeam2, "cyan", true);
-	
-	const isColor = winProbability1 === winProbability2
-		? "netflixRed"
+	outcomeMessage = absoluteDiff <= 0.0175
+		? withColorLogger(eitherWayMsg, "netflixRed", true)
 		: winProbability1 > winProbability2
-			? "netflixRed"
-			: "cyan";
+			? withColorLogger(`Expected winner: ${ data.team1.name }`, "cyan", true)
+			: withColorLogger(`Expected winner: ${ data.team2.name }`, "cyan", true);
 	
-	withConsoleColorLogger(outcomeMessage, isColor, true);
-	withConsoleColorLogger(spacer, "dodgerBlue", true);
+	outcomeLogger(
+		data,
+		winProbability1,
+		winProbability2,
+		outcomeMessage,
+	);
 	
 	// Return the outcome message for further use or display
 	return outcomeMessage;
@@ -110,14 +77,11 @@ export const predictOverUnder = (data: GameData): string => {
 	const regAdjustmentFactor = calcRegressionFactor(data.team1, data.team2);
 	const averageScorePerGame = (((totalScored + totalAllowed) / totalGamesPlayed) * regAdjustmentFactor) - 1.5;
 	
-	withConsoleColorLogger(`Over/Under Line: ${ data.overUnderLine }`, "netflixRed", true);
-	withConsoleColorLogger(`Over/Under Line: ${ data.overUnderLine }`, "netflixRed", true);
+	overUnderLogger(data, averageScorePerGame);
 	
-	const avgScoreMsg = `Average Score Per Game: ${ averageScorePerGame.toFixed(2) }`;
-	withConsoleColorLogger(avgScoreMsg, "cyan", true);
-	withConsoleColorLogger(spacer, "dodgerBlue", true);
-	
-	const predictionResult = averageScorePerGame > (data.overUnderLine || 0) ? "Over\n" : "Under\n";
+	const predictionResult = averageScorePerGame > (data.overUnderLine || 0)
+		? "Over\n"
+		: "Under\n";
 	
 	return predictionResult;
 };
