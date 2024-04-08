@@ -1,4 +1,4 @@
-// FILE: FILE_NAME
+// FILE: main.ts
 // _______________________________________________
 
 import { predictOutcome, predictOverUnder } from "./application/predictions";

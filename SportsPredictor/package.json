@@ -2,12 +2,12 @@
   "name": "sportspredictor",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "main.js",
   "scripts": {
     "clean": "rimraf ./build",
     "build": "npm run clean && tsc",
-    "start": "node build/app.js",
-    "local": "ts-node src/app.ts",
+    "start": "node build/main.js",
+    "local": "ts-node src/main.ts",
     "watch": "nodemon"
   },
   "keywords": [],
