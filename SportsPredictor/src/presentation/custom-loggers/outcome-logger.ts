@@ -14,7 +14,7 @@ export const outcomeLogger = (
 	// Logging structure
 	withConsoleColorLogger(spacer, "dodgerBlue", true);
 	withConsoleColorLogger(
-		`Teams: ${ data.team1.name } vs ${ data.team2.name }`,
+		`Teams: ${ data.team2.name } vs ${ data.team1.name }`,
 		"netflixRed", true,
 	);
 	
@@ -37,11 +37,15 @@ export const outcomeLogger = (
 		withConsoleColorLogger(`Spread: ${ data.spread }`, "cyan", true);
 	}
 	
-	const msgTeam1 = `Team 1 (${ data.team1.name }) Win Probability: ${ (winProbability1 * 100).toFixed(2) }%`;
-	withConsoleColorLogger(msgTeam1, "cyan", true);
-	
-	const msgTeam2 = `Team 2 (${ data.team2.name }) Win Probability: ${ (winProbability2 * 100).toFixed(2) }%`;
+	const msgTeam2 = `AWAY TEAM (${ data.team2.name }) Win Probability: ${
+		(winProbability2 * 100).toFixed(2)
+	}%`;
 	withConsoleColorLogger(msgTeam2, "cyan", true);
+	
+	const msgTeam1 = `HOME TEAM (${ data.team1.name }) Win Probability: ${
+		(winProbability1 * 100).toFixed(2)
+	}%`;
+	withConsoleColorLogger(msgTeam1, "cyan", true);
 	
 	const isColor = winProbability1 === winProbability2
 		? "netflixRed"

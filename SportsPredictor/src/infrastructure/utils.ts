@@ -14,4 +14,9 @@ export const roundHelper = (num: number): number => {
 export const scoredAndAllowedAdjuster = (num: number): number => (
 	num * 1.5
 )
-// _______________________________________________
+// _____________________________________________________________________
+
+export const toNumber = (input: string): number => {
+	return Number(input) || 0;
+};
+// _____________________________________________________________________

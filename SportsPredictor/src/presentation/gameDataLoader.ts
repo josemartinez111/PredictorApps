@@ -3,11 +3,47 @@
 
 import { predictOutcome, predictOverUnder } from "../application/predictions";
 import { GameData, TeamData } from "../domain/dataEntities";
-import { DataInputLogic, GameDataInputType, LoaderLogic } from "../domain/types/typeHelpers";
+import {
+	ChooseGameTypeParams, ChooseGameTypeReturn,
+	DataInputLogic,
+	GameDataInputType,
+	LoaderLogic,
+} from "../domain/types/typeHelpers";
 import { roundHelper, scoredAndAllowedAdjuster } from "../infrastructure/utils";
 import { withConsoleColorLogger } from "./custom-loggers/colorLogger";
+import { readInput } from "./custom-loggers/game-prompt-logger";
+import { MatchUpStatsManually, MatchUpStatsUserInput } from "./matchUpDataLoader";
 
 // _______________________________________________
+
+export function runApp(
+	loader: LoaderLogic,
+	team1Data: TeamData,
+	team2Data: TeamData,
+	gameDataInput: DataInputLogic) {
+	
+	const gameData = loader.loadGameData(
+		team1Data,
+		team2Data,
+		gameDataInput,
+	);
+	
+	const headerMsg = `=================== [ ${ gameData.sport } ] ====================`;
+	withConsoleColorLogger(headerMsg, "dodgerBlue", true);
+	
+	predictOutcome(gameData);
+	const overUnderPrediction = predictOverUnder(gameData);
+	
+	withConsoleColorLogger(
+		`Over/Under prediction: ${ overUnderPrediction }`,
+		"cyan",
+		true,
+	);
+	
+	readInput.close();
+}
+
+// ___________________________________________________________________
 
 export function GameDataLoader() {
 	// Utility method for creating team data
@@ -50,7 +86,14 @@ export function GameDataLoader() {
 		team1Data: TeamData,
 		team2Data: TeamData,
 		gameDataInput: GameDataInputType): GameData => {
-		const { sport, overUnderLine, spread, homeTeam, favoredTeam } = gameDataInput; // Default kFactor to 30 if not supplied
+		
+		const {
+			sport,
+			overUnderLine,
+			spread,
+			homeTeam,
+			favoredTeam,
+		} = gameDataInput; // Default kFactor to 30 if not supplied
 		
 		// Validate inputs (example)
 		if (overUnderLine <= 0) throw new Error("OverUnderLine must be positive");
@@ -73,31 +116,33 @@ export function GameDataLoader() {
 		loadGameData,
 	};
 }
-
 // ___________________________________________________________________
 
-export function runApp(
-	loader: LoaderLogic,
-	team1Data: TeamData,
-	team2Data: TeamData,
-	gameDataInput: DataInputLogic) {
+export async function chooseGameType({
+	whichGameType, loader,
+}: ChooseGameTypeParams): Promise<ChooseGameTypeReturn> {
 	
-	const gameData = loader.loadGameData(
-		team1Data,
-		team2Data,
-		gameDataInput,
-	);
-	
-	const headerMsg = `=================== [ ${ gameData.sport } ] ====================`;
-	withConsoleColorLogger(headerMsg, "dodgerBlue", true);
-	
-	predictOutcome(gameData);
-	const overUnderPrediction = predictOverUnder(gameData);
-	
-	withConsoleColorLogger(
-		`Over/Under prediction: ${ overUnderPrediction }`,
-		"cyan",
-		true,
-	);
-};
+	switch (whichGameType) {
+		case "input":
+			const item = await MatchUpStatsUserInput(loader);
+			// Direct return from the function if the structure matches ChooseGameTypeReturn
+			return {
+				team1Data: item.team1Data,
+				team2Data: item.team2Data,
+				gameDataInput: item.gameDataInput, // Ensure MatchUpStatsUserInput returns this
+			};
+		case "manual":
+			const response = MatchUpStatsManually(loader);
+			// Adjust MatchUpStatsManually or its handling here to ensure compatibility
+			return {
+				team1Data: response.team1Data,
+				team2Data: response.team2Data,
+				gameDataInput: response.gameDataInput, // Ensure MatchUpStatsManually returns this
+			};
+		default:
+			// Fallback or error handling for invalid game type
+			throw new Error("Invalid game type specified");
+	}
+}
+
 // ___________________________________________________________________
