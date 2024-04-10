@@ -29,11 +29,13 @@ const colors: Record<ColorName, string> = {
 export const withConsoleColorLogger = (
 	msg: string,
 	color: ColorName = 'reset',
-	isBold: boolean = false): void => {
+	isBold: boolean = false): string => {
 	
 	const colorCode = colors[ color ];
 	const bold = isBold ? colors.bold : '';
 	console.log(`${ bold }${ colorCode }${ msg }${ colors.reset }`);
+	
+	return msg;
 };
 
 export const withColorLogger = (
@@ -65,5 +67,5 @@ export const spacerH1 = (character: string = "-", spaceCount: number, color: Col
 	const spacer = character.repeat(spaceCount);
 	const item = withColorLogger(spacer, color, true);
 	return item;
-}
+};
 // _______________________________________________

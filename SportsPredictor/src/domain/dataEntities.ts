@@ -26,3 +26,12 @@ export interface GameData {
 	favoredTeam: string;
 }
 // _______________________________________________
+
+export type GameDataInputPrompt = {
+	favoredTeam: string;
+	overUnderLine: number;
+	homeTeam: string;
+	sport: string;
+	spread: number;
+}
+// _______________________________________________

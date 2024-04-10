@@ -1,46 +1,80 @@
 // FILE: main.ts
 // _______________________________________________
 
-import { GameDataLoader, runApp } from "./presentation/gameDataLoader";
-import { MatchFullStats } from "./presentation/matchUpDataLoader";
+import { chooseGameType, GameDataLoader, runApp } from "./presentation/gameDataLoader";
 // _______________________________________________
 
-function main() {
+async function main() {
 	const loader = GameDataLoader(); // Initialize once
+	const isGame: Array<string> = ["input", "manual"]
 	
 	const {
 		team1Data,
 		team2Data,
-		gameDataInput,
-	} = MatchFullStats(loader);
+		gameDataInput
+	} = await chooseGameType({
+		whichGameType: isGame[1],
+		loader: loader,
+	});
 	
 	runApp(
 		loader,
 		team1Data,
 		team2Data,
 		gameDataInput
-	);
+	)
 }
-
 // _______________________________________________
 
-main();
+main().catch((err: unknown): void => {
+	if (err instanceof Error)
+		console.error('Error starting the server:', err.message);
+	// Re-throw the error for further handling
+	throw err;
+});
+// _____________________________________________________________________
+
 /**
-   FOR ALL LINES CHECK AT THE ( HALF-5 INNINGS )
+   FOR ALL LINES CHECK AT THE ( HALF-5 INNINGS ) ❌✅
       __________________________________________________________________
-   1. +MIA @ NYY (UNDER?/8 {6.21})=??? (Maybe->Probabilities: 48.09% at 51.91%)game=❌|over/under=❌
+   1. +DET @ PIT (UNDER/8.5 {6.02})=DET/8 (Maybe->Probabilities: 52.45% at 47.55%)
+      game=✅|over/under=✅
       __________________________________________________________________
-   2. +DET @ PIT (UNDER/8.5 {4.33})=??? (Maybe->Probabilities: 56.81% at 43.19%)game=✅|over/under=❌
+   2. +BAL @ BOS (UNDER/8 {6.53})=BAL/8 (Maybe->Probabilities: 47.70% at 52.30%)
+      game=✅|over/under=✅
       __________________________________________________________________
-   3. -MIL @ CIN (UNDER/9.5 {6.06})=??? (Maybe->Probabilities: 56.22% at 43.78%)game=✅|over/under=✅
+   3. -LAD @ MIN (UNDER/8.5 {6.70})= (Maybe->Probabilities: 65.35% at 34.65%)
+      game=  |over/under=
       __________________________________________________________________
-   4. -SEA @ TOR (UNDER/8 {6.07})=COL (Maybe->Probabilities: 59.96% at 40.04%)game=❌|over/under=✅
+   4. -PHI @ STL (UNDER/8 {6.48})=STL (Maybe->Probabilities: 47.76% at 52.24%)
+        game= |over/under=
       __________________________________________________________________
 	   
 	   
-   5. BOS @ -MIN (OVER/8 {8.43})=MIN (Maybe->Probabilities: 40.05% at 59.95%)game=❌|over/under=✅
+   5. BOS @ -MIN (OVER/8 {})= (Maybe->Probabilities: 40.05% at 59.95%)
+      game=|over/under=
       __________________________________________________________________
-   6. ARI @ -MIL (OVER/7.5 {8.56})=MIL (Maybe->Probabilities: 45.46% at 54.54%)game=❌|over/under=❌
+   6. ARI @ -MIL (OVER/7.5 {8.56})=MIL/7 (Maybe->Probabilities: 45.46% at 54.54%)
+      game=❌|over/under=❌
       __________________________________________________________________
+	 7. ARI @ -MIL (OVER/7.5 {8.56})=MIL/7 (Maybe->Probabilities: 45.46% at 54.54%)
+	      game=❌|over/under=❌
+	      __________________________________________________________________
+	 8. ARI @ -MIL (OVER/7.5 {8.56})=MIL/7 (Maybe->Probabilities: 45.46% at 54.54%)
+	      game=❌|over/under=❌
+	      __________________________________________________________________
+	   
+	 9. BOS @ -MIN (OVER/8 {})= (Maybe->Probabilities: 40.05% at 59.95%)
+      game=|over/under=
+      __________________________________________________________________
+   10. ARI @ -MIL (OVER/7.5 {8.56})=MIL/7 (Maybe->Probabilities: 45.46% at 54.54%)
+      game=❌|over/under=❌
+      __________________________________________________________________
+	 11. ARI @ -MIL (OVER/7.5 {8.56})=MIL/7 (Maybe->Probabilities: 45.46% at 54.54%)
+	      game=❌|over/under=❌
+	      __________________________________________________________________
+	 12. ARI @ -MIL (OVER/7.5 {8.56})=MIL/7 (Maybe->Probabilities: 45.46% at 54.54%)
+	      game=❌|over/under=❌
+	      __________________________________________________________________
  */
 // _______________________________________________
