@@ -9,7 +9,11 @@ import { promptForTeamData, promptQuestion } from "./custom-loggers/game-prompt-
 
 // _______________________________________________
 
-export function MatchUpStatsManually(loader: MatchFullStatsParams) {
+export function MatchUpStatsManually(loader: MatchFullStatsParams): {
+	team1Data: TeamData;
+	team2Data: TeamData;
+	gameDataInput: GameDataInputPrompt
+} {
 	// Example team data, ideally loaded from a database or external source
 	const team1Data: TeamData = loader.createTeamData(
 		"BOS",

@@ -43,11 +43,11 @@ main().catch((err: unknown): void => {
    2. +BAL @ BOS (UNDER/8 {6.53})=BAL/8 (Maybe->Probabilities: 47.70% at 52.30%)
       game=✅|over/under=✅
       __________________________________________________________________
-   3. -LAD @ MIN (UNDER/8.5 {6.70})= (Maybe->Probabilities: 65.35% at 34.65%)
-      game=  |over/under=
+   3. -LAD @ MIN (UNDER/8.5 {6.70})=MIN/5 (Maybe->Probabilities: 65.35% at 34.65%)
+      game=❌  |over/under=✅
       __________________________________________________________________
-   4. -PHI @ STL (UNDER/8 {6.48})=STL (Maybe->Probabilities: 47.76% at 52.24%)
-        game= |over/under=
+   4. -PHI @ STL (UNDER/8 {6.48})=STL/7 (Maybe->Probabilities: 47.76% at 52.24%)
+        game=✅ |over/under=✅
       __________________________________________________________________
 	   
 	   
