@@ -1,5 +1,6 @@
-// FILE: application/predictions.ts
-// _______________________________________________
+// ---------------------------------------------------------
+//               application/predictions.ts
+// ---------------------------------------------------------
 
 import { GameData, TeamData } from "../domain/dataEntities";
 import { withColorLogger } from "../presentation/custom-loggers/colorLogger";
@@ -18,18 +19,18 @@ export const predictOutcome = (data: GameData): string => {
 		data.team2,
 		data,
 	);
-	
+
 	// Calculate advanced metrics for both teams
 	const pythagoreanWinPercentage1 = calcWinPctPythagorean(data.team1);
 	const pythagoreanWinPercentage2 = calcWinPctPythagorean(data.team2);
-	
+
 	// Advanced spread factor calculation
 	const spreadFactor1 = calcAdvancedSpreadFactor(data, data.team1);
 	const spreadFactor2 = calcAdvancedSpreadFactor(data, data.team2);
-	
+
 	// Singular regression factor calculation for efficiency
 	const regressionFactor = calcRegressionFactor(data.team1, data.team2);
-	
+
 	// Introduce dynamic weighting based on the stage of the season or other factors
 	// Elo ratings are adjusted based on the expected change derived from calcExpectedEloChange
 	const weightedWinProb1 = dynamicWeighting(
@@ -39,7 +40,7 @@ export const predictOutcome = (data: GameData): string => {
 		regressionFactor,
 		data,
 	);
-	
+
 	const weightedWinProb2 = dynamicWeighting(
 		pythagoreanWinPercentage2,
 		data.team2.elo + expectedEloChange2, // Dynamically adjust Elo rating based on expected change
@@ -47,19 +48,19 @@ export const predictOutcome = (data: GameData): string => {
 		regressionFactor,
 		data,
 	);
-	
+
 	// Normalize win probabilities
 	const totalWeightedProbability = weightedWinProb1 + weightedWinProb2;
 	const normalizedWinProb1 = weightedWinProb1 / totalWeightedProbability;
 	const normalizedWinProb2 = weightedWinProb2 / totalWeightedProbability;
-	
+
 	// Determine expected winner with an adaptive close game threshold
 	const outcomeMessage = determineOutcome(
 		data,
 		normalizedWinProb1,
 		normalizedWinProb2,
 	);
-	
+
 	// Log the outcome
 	outcomeLogger(
 		data,
@@ -67,7 +68,7 @@ export const predictOutcome = (data: GameData): string => {
 		normalizedWinProb2,
 		outcomeMessage,
 	);
-	
+
 	return outcomeMessage;
 };
 // ____________________________________________________________________

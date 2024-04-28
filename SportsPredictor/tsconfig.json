@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"resolveJsonModule": true,
+		/* in case you are importing JSON files */
+		"target": "ESNext",
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"sourceMap": true,
+		"strict": true,
+		"noImplicitAny": true,
+		"skipLibCheck": true,
+		"outDir": "dist",
+	},
+	"include": [
+		"src/**/*"
+	],
+}

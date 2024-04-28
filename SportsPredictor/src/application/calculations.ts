@@ -4,6 +4,25 @@
 import { GameData, TeamData } from "../domain/dataEntities";
 import { EloChangeType } from "../domain/types/typeHelpers";
 // _______________________________________________
+// ***************************************************************
+// The version using the Americium-241 decay model
+// ***************************************************************
+
+// Simulation of Americium-241 decay adjusted by dynamic team performance metrics
+const simulateDecay = (team: TeamData): number => {
+	const lambdaBase = 0.693 / 432;  // Decay constant based on the half-life of Americium-241
+	const seasonProgress = team.totalGamesPlayed ? team.totalGamesPlayed / 162 : 0;  // Proportional to the number of games played
+	const performanceVariance = (team.scored - team.allowed) / (team.totalGamesPlayed ?? 1);  // Variance in performance
+	const dynamicLambda = lambdaBase * (1 + seasonProgress + performanceVariance);  // Adjust the lambda based on the team's season progress and performance variance
+	
+	const baselineElo = 1500;  // Assume a baseline Elo for simplicity or derive from league average
+	const eloDeviation = Math.abs(team.elo - baselineElo);  // Calculate the deviation of team Elo from the baseline Elo
+	
+	return Math.exp(-dynamicLambda * eloDeviation);  // Apply the adjusted decay model
+};
+
+
+// ***************************************************************
 
 // Function to calculate the standard deviation of team performance metrics.
 // Assumes that all necessary team metrics are provided and correctly populated
@@ -31,8 +50,12 @@ const calculateSTDDevFactor = (team: TeamData): number => {
 	), 0) / (data.length - 1);
 	
 	// Return the square root of the variance (standard deviation)
-	const sqRootResult = Math.sqrt(variance);
-	return sqRootResult;
+	const stdDev = Math.sqrt(variance);
+	const decayAdjustment = simulateDecay(team);
+	// Apply the decay factor calculated from the team data
+	const result = stdDev * decayAdjustment;
+	
+	return result;
 };
 // ___________________________________________________________________
 
@@ -43,7 +66,10 @@ export const calcWinPctPythagorean = (team: TeamData): number => {
 	} = team;
 	const variabilityFactor = calculateSTDDevFactor(team);
 	// Adjust Pythagorean win percentage calculation with the variability factor.
-	const pythagoreanWinPercentage = (scored ** 2 / (scored ** 2 + allowed ** 2)) * (1 + variabilityFactor);
+	const EXPONENT = 0.287;
+	const pythagoreanWinPercentage = (
+		scored ** EXPONENT / (scored ** EXPONENT + allowed ** EXPONENT)
+		) * (1.83 + variabilityFactor);
 	return pythagoreanWinPercentage;
 };
 // ___________________________________________________________________
