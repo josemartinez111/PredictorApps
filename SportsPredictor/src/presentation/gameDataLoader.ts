@@ -4,13 +4,14 @@
 import { predictOutcome, predictOverUnder } from "../application/predictions";
 import { GameData, TeamData } from "../domain/dataEntities";
 import {
-	ChooseGameTypeParams, ChooseGameTypeReturn,
+	ChooseGameTypeParams,
+	ChooseGameTypeReturn,
 	DataInputLogic,
 	GameDataInputType,
 	LoaderLogic,
 } from "../domain/types/typeHelpers";
 import { roundHelper, scoredAndAllowedAdjuster } from "../infrastructure/utils";
-import { withConsoleColorLogger } from "./custom-loggers/colorLogger";
+import { Color, withConsoleColorLogger } from "./custom-loggers/colorLogger";
 import { readInput } from "./custom-loggers/game-prompt-logger";
 import { MatchUpStatsManually, MatchUpStatsUserInput } from "./matchUpDataLoader";
 
@@ -29,14 +30,14 @@ export function runApp(
 	);
 	
 	const headerMsg = `=================== [ ${ gameData.sport } ] ====================`;
-	withConsoleColorLogger(headerMsg, "dodgerBlue", true);
+	withConsoleColorLogger(headerMsg, Color.DodgerBlue, true);
 	
 	predictOutcome(gameData);
 	const overUnderPrediction = predictOverUnder(gameData);
 	
 	withConsoleColorLogger(
 		`Over/Under prediction: ${ overUnderPrediction }`,
-		"cyan",
+		Color.HotPink,
 		true,
 	);
 	
@@ -116,6 +117,7 @@ export function GameDataLoader() {
 		loadGameData,
 	};
 }
+
 // ___________________________________________________________________
 
 export async function chooseGameType({

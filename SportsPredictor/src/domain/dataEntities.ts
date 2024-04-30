@@ -27,11 +27,5 @@ export interface GameData {
 }
 // _______________________________________________
 
-export type GameDataInputPrompt = {
-	favoredTeam: string;
-	overUnderLine: number;
-	homeTeam: string;
-	sport: string;
-	spread: number;
-}
+export type GameDataInputPrompt = Partial<GameData>;
 // _______________________________________________

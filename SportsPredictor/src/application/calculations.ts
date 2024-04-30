@@ -9,7 +9,7 @@ import { EloChangeType } from "../domain/types/typeHelpers";
 // ***************************************************************
 
 // Simulation of Americium-241 decay adjusted by dynamic team performance metrics
-const simulateDecay = (team: TeamData): number => {
+const simulateDecayRunLine = (team: TeamData): number => {
 	const lambdaBase = 0.693 / 432;  // Decay constant based on the half-life of Americium-241
 	const seasonProgress = team.totalGamesPlayed ? team.totalGamesPlayed / 162 : 0;  // Proportional to the number of games played
 	const performanceVariance = (team.scored - team.allowed) / (team.totalGamesPlayed ?? 1);  // Variance in performance
@@ -21,7 +21,32 @@ const simulateDecay = (team: TeamData): number => {
 	return Math.exp(-dynamicLambda * eloDeviation);  // Apply the adjusted decay model
 };
 
-
+export const simulateDecayForOverUnder = (team1: TeamData, team2: TeamData): number => {
+	// const {} = GameData;
+	
+	const halfLife = 432;  // Using the half-life of Americium-241 metaphorically
+	const lambda = Math.log(2) / halfLife;  // Decay constant derived from half-life
+	const totalGamesPlayed = (team1.totalGamesPlayed ?? 0) + (team2.totalGamesPlayed ?? 0);
+	const seasonFactor = totalGamesPlayed / 162;  // Season factor assuming 162 games per season
+	
+	// Calculate metrics for decay application
+	const eloDifference = Math.abs(team1.elo - team2.elo);
+	const scoringVariance = Math.abs((team1.scored - team1.allowed) + (team2.scored - team2.allowed)) / totalGamesPlayed;
+	const decayedAmount = scoringVariance * Math.exp(-lambda * seasonFactor);
+	const decayAdjustment = eloDifference / 400;
+	
+	// Combined decay output
+	const combinedAdjustment = decayedAmount + decayAdjustment;
+	
+	// Adjustment scale array (example values could be more nuanced based on model refinement)
+	const adjustments = [-2.0, -1.5, -1.0, -0.5, 0.5, 1.0, 1.5, 2.0];
+	
+	// Select an adjustment based on the magnitude of the combinedAdjustment
+	let adjustmentIndex = Math.floor((combinedAdjustment + adjustments.length) / 2);
+	adjustmentIndex = Math.max(0, Math.min(adjustments.length - 1, adjustmentIndex)); // Ensure index is within bounds
+	
+	return adjustments[adjustmentIndex];
+};
 // ***************************************************************
 
 // Function to calculate the standard deviation of team performance metrics.
@@ -51,7 +76,7 @@ const calculateSTDDevFactor = (team: TeamData): number => {
 	
 	// Return the square root of the variance (standard deviation)
 	const stdDev = Math.sqrt(variance);
-	const decayAdjustment = simulateDecay(team);
+	const decayAdjustment = simulateDecayRunLine(team);
 	// Apply the decay factor calculated from the team data
 	const result = stdDev * decayAdjustment;
 	
@@ -119,11 +144,16 @@ export const calcRegressionFactor = (team1: TeamData, team2: TeamData): number =
 	// Consideration for combined performance trend with dynamic adjustments
 	const combinedTrendScore = (trendScore1 + trendScore2) / 2; // Average trend score for simplicity
 	
-	// Adjustment factor based on combined trend scores with safety bounds
-	const adjustmentFactor = 1 + (combinedTrendScore / 100); // Normalize trend impact
+	const decayFactor = simulateDecayForOverUnder(team1, team2);
+	
+	// Applying an enhanced decay factor influence
+	const modifiedTrendScore = (
+		combinedTrendScore + (combinedTrendScore * Math.sign(decayFactor) * Math.abs(decayFactor) / 2)
+	);
+	
+	const adjustmentFactor = 1 + (modifiedTrendScore / 100);
 	const adjustedFactorSafeBound = Math.max(0.9, Math.min(1.1, adjustmentFactor));
 	
-	// Return the safely bounded adjustment factor
 	return adjustedFactorSafeBound;
 };
 // ____________________________________________________________________

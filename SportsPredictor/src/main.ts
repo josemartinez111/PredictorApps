@@ -1,6 +1,7 @@
 // FILE: main.ts
 // _______________________________________________
 
+import { DataInputLogic } from "./domain/types/typeHelpers";
 import { chooseGameType, GameDataLoader, runApp } from "./presentation/gameDataLoader";
 // _______________________________________________
 
@@ -21,7 +22,7 @@ async function main() {
 		loader,
 		team1Data,
 		team2Data,
-		gameDataInput
+		<DataInputLogic>gameDataInput
 	)
 }
 // _______________________________________________
@@ -37,7 +38,7 @@ main().catch((err: unknown): void => {
 /**
    FOR ALL LINES CHECK AT THE ( HALF-5 INNINGS ) ❌✅
       __________________________________________________________________
-   1. +DET @ PIT (UNDER/8.5 {6.02})=DET/8 (Maybe->Probabilities: 52.45% at 47.55%)
+   1. +OAK @ BAL (UNDER/8.5 {6.02})=DET/8 (Maybe->Probabilities: 52.45% at 47.55%)
       game=✅|over/under=✅
       __________________________________________________________________
    2. +BAL @ BOS (UNDER/8 {6.53})=BAL/8 (Maybe->Probabilities: 47.70% at 52.30%)

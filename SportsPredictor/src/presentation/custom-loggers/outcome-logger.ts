@@ -3,7 +3,7 @@
 
 import { GameData } from "../../domain/dataEntities";
 import { spacer } from "../../domain/types/typeHelpers";
-import { withConsoleColorLogger } from "./colorLogger";
+import { Color, spacerH1, withConsoleColorLogger } from "./colorLogger";
 // _______________________________________________
 
 export const outcomeLogger = (
@@ -11,49 +11,67 @@ export const outcomeLogger = (
 	winProbability1: number,
 	winProbability2: number,
 	outcomeMessage: string): void => {
+	
 	// Logging structure
-	withConsoleColorLogger(spacer, "dodgerBlue", true);
+	withConsoleColorLogger(spacer, Color.DodgerBlue, true);
+	const spacerLine = spacerH1("-", 33, Color.White);
+	
 	withConsoleColorLogger(
-		`Teams: ${ data.team2.name } vs ${ data.team1.name }`,
-		"netflixRed", true,
+		`\nTeams: ${ data.team2.name } vs ${ data.team1.name }`,
+		Color.BrightYellow, true,
 	);
+	
+	console.log(spacerLine);
+	
 	
 	if (data.homeTeam === data.team1.name) {
 		withConsoleColorLogger(
-			`Home Team: ${ data.team1.name }`,
-			"netflixRed",
+			`\nHome Team: ${ data.team1.name }`,
+			Color.Magenta,
 			true,
 		);
+		
+		console.log(spacerLine);
 	} else if (data.homeTeam === data.team2.name) {
 		withConsoleColorLogger(
-			`Home Team: ${ data.team2.name }`,
-			"netflixRed",
+			`\nHome Team: ${ data.team2.name }\n`,
+			Color.NetflixRed,
 			true,
 		);
+		
+		console.log(spacerLine);
 	}
-	withConsoleColorLogger(spacer, "dodgerBlue", true);
+	
+	withConsoleColorLogger(
+		`\n(-) Favored Team: ${ data.favoredTeam }`,
+		Color.HotPink,
+		true,
+	);
+	
+	console.log(spacerLine);
+	withConsoleColorLogger(spacer, Color.DodgerBlue, true);
 	
 	if (data.spread) {
-		withConsoleColorLogger(`Spread: ${ data.spread }`, "cyan", true);
+		withConsoleColorLogger(`Spread: ${ data.spread }`, Color.Red, true);
 	}
 	
 	const msgTeam2 = `AWAY TEAM (${ data.team2.name }) Win Probability: ${
 		(winProbability2 * 100).toFixed(2)
 	}%`;
-	withConsoleColorLogger(msgTeam2, "cyan", true);
+	withConsoleColorLogger(msgTeam2, Color.Cyan, true);
 	
 	const msgTeam1 = `HOME TEAM (${ data.team1.name }) Win Probability: ${
 		(winProbability1 * 100).toFixed(2)
 	}%`;
-	withConsoleColorLogger(msgTeam1, "cyan", true);
+	withConsoleColorLogger(msgTeam1, Color.Cyan, true);
 	
 	const isColor = winProbability1 === winProbability2
-		? "netflixRed"
+		? Color.NetflixRed
 		: winProbability1 > winProbability2
-			? "netflixRed"
-			: "cyan";
+			? Color.NetflixRed
+			: Color.Cyan;
 	
 	withConsoleColorLogger(outcomeMessage, isColor, true);
-	withConsoleColorLogger(spacer, "dodgerBlue", true);
+	withConsoleColorLogger(spacer, Color.DodgerBlue, true);
 };
 // ___________________________________________________________________
