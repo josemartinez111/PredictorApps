@@ -1,14 +1,14 @@
 // FILE: domain/types/typeHelpers.ts
 // _______________________________________________
 
-import { spacerH1 } from "../../presentation/custom-loggers/colorLogger";
+import { Color, spacerH1 } from "../../presentation/custom-loggers/colorLogger";
 import { GameData, GameDataInputPrompt, TeamData } from "../dataEntities";
 // _______________________________________________
 
 export const spacer = spacerH1(
 	"_",
 	55,
-	"dodgerBlue"
+	Color.DodgerBlue
 );
 // ___________________________________________________________________
 

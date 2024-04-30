@@ -3,7 +3,7 @@
 // ---------------------------------------------------------
 
 import { GameData, TeamData } from "../domain/dataEntities";
-import { withColorLogger } from "../presentation/custom-loggers/colorLogger";
+import { Color, withColorLogger } from "../presentation/custom-loggers/colorLogger";
 import { outcomeLogger } from "../presentation/custom-loggers/outcome-logger";
 import { overUnderLogger } from "../presentation/custom-loggers/over-under-logger";
 import {
@@ -79,15 +79,24 @@ export const predictOverUnder = (data: GameData): string => {
 	const totalGamesPlayed = (data.team1.totalGamesPlayed || 0) + (data.team2.totalGamesPlayed || 0);
 	
 	if (totalGamesPlayed !== 0) {
-		const combinedAverageScore = (totalScored + totalAllowed) / totalGamesPlayed;
+		const combinedAverageScore = (totalScored + totalAllowed) / totalGamesPlayed + 0.95;
 		const regAdjustmentFactor = calcRegressionFactor(data.team1, data.team2);
 		const eloDiff = Math.abs(data.team1.elo - data.team2.elo);
+		
 		const eloAdjustment = 1 / (1 + Math.exp(eloDiff / 400));
 		const headToHeadWins = (data.team1.headToHeadWins || 0) - (data.team2.headToHeadWins || 0);
 		const headToHeadAdjustment = headToHeadWins / totalGamesPlayed;
-		const adjustedAverageScore = (combinedAverageScore * regAdjustmentFactor) + eloAdjustment + headToHeadAdjustment - 1.5;
-		overUnderLogger(data, adjustedAverageScore);
-		const predictionResult = adjustedAverageScore > (data.overUnderLine ?? 8)
+		
+		const adjustedAverageScore = (
+			(combinedAverageScore * regAdjustmentFactor) + eloAdjustment + headToHeadAdjustment - 1.5
+		);
+		
+		if (data.overUnderLine === undefined) return "Over/Under Line Not Available\n";
+		
+		const withOverUnderLine = (adjustedAverageScore / data.overUnderLine) * 10;
+		overUnderLogger(data, withOverUnderLine);
+		
+		const predictionResult = withOverUnderLine > (data.overUnderLine ?? 8)
 			? "Over\n"
 			: "Under\n";
 		
@@ -131,11 +140,11 @@ function determineOutcome(data: GameData, winProb1: number, winProb2: number): s
 	const CLOSE_GAME_THRESHOLD = 0.0175; // Placeholder for adaptive logic
 	const absoluteDiff = Math.abs(winProb1 - winProb2);
 	if (absoluteDiff <= CLOSE_GAME_THRESHOLD) {
-		return withColorLogger("[ THE GAME COULD GO EITHER WAY ]", "netflixRed", true);
+		return withColorLogger("[ THE GAME COULD GO EITHER WAY ]", Color.DoubleMintGreen, true);
 	}
 	return winProb1 > winProb2
-		? withColorLogger(`Expected winner: ${ data.team1.name }`, "cyan", true)
-		: withColorLogger(`Expected winner: ${ data.team2.name }`, "cyan", true);
+		? withColorLogger(`Expected winner: ${ data.team1.name }`, Color.Cyan, true)
+		: withColorLogger(`Expected winner: ${ data.team2.name }`, Color.Cyan, true);
 }
 
 // ____________________________________________________________________
